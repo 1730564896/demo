@@ -1,5 +1,5 @@
 <template>
-  <div class="dashboard-container">
+  <div v-loading="loading" class="dashboard-container">
     <div class="app-container">
       <!-- 组织架构头部 -->
       <el-card class="tree-card">
@@ -37,7 +37,8 @@ export default {
       },
       company: { name: '', manager: '' },
       showDialog: false,
-      node: null
+      node: null,
+      loading: false // 用来控制进度弹层的显示和隐藏
     }
   },
   created() {
@@ -45,10 +46,12 @@ export default {
   },
   methods: {
     async getDepartments() {
+      this.loading = true
       const result = await getDepartments()
       this.company = { name: result.companyName, manager: '负责人', id: '' }
       this.departs = tranListToTreeData(result.depts, '') // 需要将其转化成树形结构
       // console.log(result)
+      this.loading = false
     },
     addDepts(node) {
       this.showDialog = true // 显示弹层
