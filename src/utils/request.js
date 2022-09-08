@@ -85,10 +85,62 @@
 // export default service
 
 import axios from 'axios'
+import { Message } from 'element-ui'
+import store from '@/store'
+import { getTimeStamp } from '@/utils/auth'
+import router from '@/router'
+const TimeOut = 7200 // 设置超时时间
 // 创建axios实例
-const service = axios.create()
+const service = axios.create({
+// 当执行npm run dev时 => 开发环境 => /api => 跨域代理
+  baseURL: process.env.VUE_APP_BASE_API,
+  timeout: 5000 // 设置超时时间，超时自动报错
+}
+)
 // 设置请求拦截器
-service.interceptors.request.use()
+service.interceptors.request.use(config => {
+  // config是请求配置信息，最后必须要返回的
+  if (store.getters.token) {
+    // 检查token是否过期
+    if (IsCheckTimeOut()) {
+      // true表示过期了
+      store.dispatch('user/lgout') // 退出登录
+      router.push('/login')
+      return Promise.reject(new Error('token过期了'))
+    }
+    config.headers['Authorization'] = `Bearer ${store.getters.token}`
+  }
+  return config
+}, error => {
+  return Promise.reject(error)
+})
 // 设置响应拦截器
-service.interceptors.response.use()
+service.interceptors.response.use(response => {
+  // axios默认会给数据加上一层data
+  const { success, message, data } = response.data
+  // 要根据success的成功与否决定下面的操作
+  if (success) {
+    return data
+  } else {
+  // 业务已经错了，不能继续进then,应该偶直接进catch
+    Message.error('提示错误信息') // 提示错误信息
+    return Promise.reject(new Error(message))
+  }
+}, error => {
+  // error信息里面response对象
+  if (error.response && error.response.data && error.response.data.code === 1002) {
+    store.dispatch('user/lgout') // 退出登录
+    router.push('/login') // 跳转到登录界面
+  } else {
+    Message.error(error.message) // 提示错误信息
+  }
+  return Promise.reject(error) // 返回执行错误，让当前执行链跳出成功，直接进入catch
+})
+// 定义检查是否超时的函数
+// 超市逻辑，当前时间-缓存中的时间是否大于设置的超时时间差
+function IsCheckTimeOut() {
+  var currentTime = Date.now() // 当前时间戳
+  var timeStamp = getTimeStamp() // 缓存中的时间戳
+  return (currentTime - timeStamp) / 1000 > TimeOut
+}
 export default service
