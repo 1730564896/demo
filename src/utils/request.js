@@ -94,7 +94,7 @@ const TimeOut = 7200 // 设置超时时间
 const service = axios.create({
 // 当执行npm run dev时 => 开发环境 => /api => 跨域代理
   baseURL: process.env.VUE_APP_BASE_API,
-  timeout: 5000 // 设置超时时间，超时自动报错
+  timeout: 10000 // 设置超时时间，超时自动报错
 }
 )
 // 设置请求拦截器

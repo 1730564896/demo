@@ -1,19 +1,19 @@
 <template>
-    <div class="dashboard-container">
-      <div class="app-container">
-        <h2>
-          审批
-        </h2>
-      </div>
+  <div class="dashboard-container">
+    <div class="app-container">
+      <h2>
+        审批
+      </h2>
     </div>
-  </template>
-  
-  <script>
-  export default {
-  
-  }
-  </script>
-  
-  <style>
-  
-  </style>
+  </div>
+</template>
+
+<script>
+export default {
+
+}
+</script>
+
+<style>
+
+</style>
