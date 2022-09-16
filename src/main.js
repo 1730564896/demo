@@ -1,6 +1,7 @@
 import Vue from 'vue'
 
 import 'normalize.css/normalize.css' // A modern alternative to CSS resets
+import checkPermission from '@/mixin/checkPermission'
 
 import ElementUI from 'element-ui'
 import 'element-ui/lib/theme-chalk/index.css'
@@ -25,6 +26,7 @@ Object.keys(filters).forEach(key => {
   // 注册过滤器
   Vue.filter(key, filters[key])
 })
+Vue.mixin(checkPermission) // 全局混入检查对象
 
 // set ElementUI lang to EN
 Vue.use(ElementUI, { locale }) // 注册使用ElementUI

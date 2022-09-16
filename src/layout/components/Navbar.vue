@@ -35,6 +35,7 @@
 import { mapGetters } from 'vuex'
 // import Breadcrumb from '@/components/Breadcrumb'
 import Hamburger from '@/components/Hamburger'
+import { resetRouter } from '@/router'
 
 export default {
   components: {
@@ -59,7 +60,11 @@ export default {
     },
     logout() {
       this.$store.dispatch('user/lgout') // 这里的方法是同步的，不需要async await
+      // 重置路由
+      resetRouter()
       this.$router.push('/login') // 直接跳到登录页
+      this.$store.commit('permission/setRoutes', [], { root: true })
+    // 子模块调用子模块的action 可以 将 commit的第三个参数 设置成  { root: true } 就表示当前的context不是子模块了 而是父模块
     }
   }
 }

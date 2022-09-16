@@ -43,11 +43,11 @@
           </el-table-column>
           <el-table-column label="操作" sortable="" fixed="right" width="280" align="center">
             <template slot-scope="{ row }">
-              <el-button type="text" size="small" @click="$router.push(`/employees/detail/${row.id}`)">查看</el-button>
+              <el-button :disabled="!checkPermission('POINT-USER-UPDATE')" type="text" size="small" @click="$router.push(`/employees/detail/${row.id}`)">查看</el-button>
               <el-button type="text" size="small">转正</el-button>
               <el-button type="text" size="small">调岗</el-button>
               <el-button type="text" size="small">离职</el-button>
-              <el-button type="text" size="small">角色</el-button>
+              <el-button type="text" size="small" @click="editRole(row.id)">角色</el-button>
               <el-button type="text" size="small" @click="delEmployee(row.id)">删除</el-button>
             </template>
           </el-table-column>
@@ -70,6 +70,8 @@
         <canvas ref="myCanvas" />
       </el-row>
     </el-dialog>
+    <!-- 角色分配弹层 -->
+    <assignRole ref="assignRole" :show-role-dialog.sync="showRoleDialog" :user-id="userId" />
   </div>
 </template>
 
@@ -79,8 +81,12 @@ import EmployeeEnum from '@/api/constant/employees'
 import AddEmployee from './components/add-employee'
 import { formatDate } from '@/filters'
 import QrCode from 'qrcode'
+import assignRole from './components/assign-role.vue'
 export default {
-  components: { AddEmployee },
+  components: {
+    AddEmployee,
+    assignRole
+  },
   data() {
     return {
       loading: false, // 进度条
@@ -91,7 +97,9 @@ export default {
         total: 0 // 总数
       },
       showDialog: false,
-      showCodeDialog: false
+      showCodeDialog: false, // 控制二维码的显示
+      showRoleDialog: false, // 控制角色分配组件的显示
+      userId: null
     }
   },
   created() {
@@ -184,6 +192,11 @@ export default {
       } else {
         this.$message.warning('该用户还未上传头像')
       }
+    },
+    async editRole(id) {
+      this.userId = id // props传值 是异步的
+      await this.$refs.assignRole.getUserInfoById(id) // 父组件调用子组件方法
+      this.showRoleDialog = true
     }
   }
 }
